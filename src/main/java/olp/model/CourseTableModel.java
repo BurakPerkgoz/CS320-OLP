@@ -26,9 +26,13 @@ public class CourseTableModel implements Model {
                             <th>Course</th>
                             <th>Section</th>
                             <th>Title</th>
+                            <th>Faculty</th>
                             <th>Instructor</th>
                             <th>Credits</th>
                             <th>Term</th>
+                            <th>Corequisite</th>
+                            <th>Prerequisite</th>
+                            <th>Schedule</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,7 +40,8 @@ public class CourseTableModel implements Model {
 
         for (Course course : courses) {
             html.append("""
-                        <tr data-course-id="%s">
+                        <tr data-course-id="%s" data-description="%s">
+                            <td>%s</td>
                             <td>%s</td>
                             <td>%s</td>
                             <td>%s</td>
@@ -44,16 +49,24 @@ public class CourseTableModel implements Model {
                             <td>%s</td>
                             <td>%.1f</td>
                             <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
                         </tr>
                     """.formatted(
                     escape(course.getId()),
+                    escape(course.getDescription()),
                     escape(course.getSubject()),
                     escape(course.getCourseNo()),
                     escape(course.getSectionNo()),
                     escape(course.getTitle()),
+                    escape(course.getFaculty()),
                     escape(course.getInstructor()),
                     course.getCredits(),
-                    escape(course.getPartOfTerm())
+                    escape(course.getPartOfTerm()),
+                    escape(course.getCorequisite()),
+                    escape(course.getPrerequisite()),
+                    escape(course.getScheduleForPrint())
             ));
         }
 
