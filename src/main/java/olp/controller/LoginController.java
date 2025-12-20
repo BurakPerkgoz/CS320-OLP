@@ -9,7 +9,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*") 
-public class AuthController {
+public class LoginController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
