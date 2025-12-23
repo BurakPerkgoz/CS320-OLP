@@ -3944,7 +3944,7 @@
                     <div class="main-title-section-container">
                         <div class="container">
                             <div class="main-title-section">
-                                <h1>Power Electronics</h1>
+                                <h1>Graduation Plan</h1>
                             </div>
                         </div>
                     </div>
@@ -4804,7 +4804,7 @@
                 `/export-pdf`;
         }
 
-        function toggleCourse(id, element) {
+        function toggleCourse(id, element, toggle) {
 
             var svgRect = element.querySelector('svg rect');
             if (svgRect) {
@@ -4819,6 +4819,7 @@
 
             const formData = new FormData();
             formData.append('id', id);
+            formData.append('toggle', toggle);
 
             fetch('/took-course', {
                 method: 'POST',

@@ -11,12 +11,22 @@ import olp.database.FacultyType;
 import olp.model.GraduationTableModel;
 import olp.utils.AI;
 import olp.utils.PdfGenerator;
+import olp.utils.PdfServiceImpl;
 import olp.utils.PrerequisiteParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -90,6 +100,12 @@ public class Controller {
         }
 
         List<Course> courses = Connection.getCoursesOfMajor((String) session.getAttribute("major"), (String) session.getAttribute("semester"));
+
+        String extra_taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
+
+        for (String extra_course_id : extra_taken_courses.split(",")) {
+            courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+        }
 
         JsonArray jsonArray = new JsonArray();
 
@@ -177,6 +193,22 @@ public class Controller {
         }
     }
 
+    @PostMapping(
+            value = "/export-program-pdf",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public ResponseEntity<byte[]> exportProgramPDF(
+            @RequestParam("img") String imageBase64
+    ) throws IOException {
+
+        String cleanBase64 = imageBase64.replace("data:image/png;base64,", "");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=program.pdf")
+                .body(PdfServiceImpl.createPdfFromBase64(cleanBase64));
+    }
+
     @PostMapping(value = "/ask-ai",
             consumes=MediaType.MULTIPART_FORM_DATA_VALUE,
             produces=MediaType.TEXT_HTML_VALUE)
@@ -192,8 +224,10 @@ public class Controller {
             consumes=MediaType.MULTIPART_FORM_DATA_VALUE,
             produces=MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> addTookenCourse(HttpSession session,
-                                                  @RequestParam("id") long id
+                                                  @RequestParam("id") long id,
+                                                  @RequestParam("toggle") String toggle
     ) throws SQLException {
+
 
         if (session.getAttribute("student_id") == null) {
             return ResponseEntity.ok("user not logged in.");
@@ -201,7 +235,7 @@ public class Controller {
 
         String prerequirements = Connection.getCourseByID(id).getPrerequisite();
 
-        if (prerequirements != "") {
+        if (prerequirements != null && !prerequirements.isEmpty()) {
 
             String[] prerequirement_array = prerequirements.split(" ");
 
@@ -214,31 +248,52 @@ public class Controller {
                 }
             }
 
-            if (Integer.valueOf((String) session.getAttribute("total_credit")) <  Integer.valueOf(needed_credits)) {
-                return ResponseEntity.ok("Credit requirement not matched for this course, your credits : " + session.getAttribute("total_credit") + ", required credits : " + needed_credits);
+            if (!needed_credits.isEmpty()) {
+                if (Integer.valueOf((String) session.getAttribute("total_credit")) <  Integer.valueOf(needed_credits)) {
+                    return ResponseEntity.ok("Credit requirement not matched for this course, your credits : " + session.getAttribute("total_credit") + ", required credits : " + needed_credits);
+                }
             }
 
 
+            if (!prerequirements.contains("Dil sınavından başarılı sonucuna sahip olmak")) {
+                PrerequisiteParser.Expr expr = PrerequisiteParser.parsePrerequisite(prerequirements);
 
-            PrerequisiteParser.Expr expr = PrerequisiteParser.parsePrerequisite(prerequirements);
+                Set<String> student_taken_courses = Set.of();
 
-            Set<String> student_taken_courses = Set.of();
+                String taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
 
-            String taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
+                String[] token_course_list =  taken_courses.split(",");
 
-            String[] token_course_list =  taken_courses.split(",");
+                for (String taken_course_id : token_course_list) {
+                    Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
+                    student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
+                }
 
-            for (String taken_course_id : token_course_list) {
-                Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
-                student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
-            }
+                if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
+                    return ResponseEntity.ok("Prerequirements are not met.");
+                }
 
-            if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
-                return ResponseEntity.ok("Prerequirements are not met.");
+                taken_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
+
+                token_course_list =  taken_courses.split(",");
+
+                for (String taken_course_id : token_course_list) {
+                    Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
+                    student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
+                }
+
+                if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
+                    return ResponseEntity.ok("Prerequirements are not met.");
+                }
             }
         }
 
-        Connection.addTakenCourse((String) session.getAttribute("student_id"), String.valueOf(id));
+        if (toggle.equals("add")) {
+            Connection.addTakenCourse((String) session.getAttribute("student_id"), String.valueOf(id));
+        }
+        else {
+            Connection.removeTakenCourse((String) session.getAttribute("student_id"), String.valueOf(id));
+        }
 
         return ResponseEntity.ok("course is added to tooken list.");
     }
@@ -256,6 +311,7 @@ public class Controller {
     public String handleFormSubmission(
             @RequestParam("student_id") String studentId,
             @RequestParam("name_surname") String nameSurname,
+            @RequestParam("password") String password,
             @RequestParam("credit") int credit,
             @RequestParam("total_credits") int total_credits,
             @RequestParam("major") String major,

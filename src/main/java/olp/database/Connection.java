@@ -323,6 +323,25 @@ public class Connection {
         return null;
     }
 
+    public static Course getCourseFromMajorByID(String major, long id) throws SQLException {
+
+        System.out.println("SELECT * FROM " + major + " WHERE Id = " + id);
+
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM " + major + " WHERE Id = " + id)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String codeAll = rs.getString("CODE");
+
+                    System.out.println(codeAll);
+
+                    return mapMajorCourseToGeneralCourse(codeAll.split(" ")[0], codeAll.split(" ")[1]);
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static List<Course> getCourses(
             int offset,
             int limit,

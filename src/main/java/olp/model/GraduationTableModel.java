@@ -33,6 +33,10 @@ public class GraduationTableModel {
 
                 boolean isTook = Connection.getTakenCourses(student_id).contains(String.valueOf(course.getId()));
 
+                if (!isTook) {
+                    isTook = Connection.getCurrentCourses(student_id).contains(String.valueOf(course.getId()));
+                }
+
                 if (course.getId() == 0) {
                     isTook = false;
                 }
@@ -47,7 +51,7 @@ public class GraduationTableModel {
                     <div class="dtlms-curriculum-meta-title"><a href="#" onclick="getCourseDetails('%s')">%s %s - %s</a></div>
                     <div class="dtlms-curriculum-meta-items">
                         <div class="yith-wcwl-add-button">
-                            <a onclick="toggleCourse('%s', this)" class="add_to_wishlist single_add_to_wishlist" rel="nofollow">
+                            <a onclick="toggleCourse('%s', this, '%s')" class="add_to_wishlist single_add_to_wishlist" rel="nofollow">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24" height="24">
                                     <rect id="checkbox" x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2" fill="%s" stroke="%s"/>
                                 </svg>
@@ -55,7 +59,7 @@ public class GraduationTableModel {
                             </a>
                         </div>
                     </div>
-                </li>""".formatted(course.getId(), course.getSubject(), course.getCourseNo(), course.getTitle(), course.getId(), checkboxFill, checkboxStroke, courseTakeDrop);
+                </li>""".formatted(course.getId(), course.getSubject(), course.getCourseNo(), course.getTitle(), course.getId(), isTook ? "drop" : "add", checkboxFill, checkboxStroke, courseTakeDrop);
 
                 html.append(singleCourse);
             }

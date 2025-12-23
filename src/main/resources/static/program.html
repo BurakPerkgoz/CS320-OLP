@@ -3923,6 +3923,7 @@
     </div><!-- ** Header Wrapper - End ** -->
 
     <!-- **Main** -->
+    <button onclick="exportCalendarPdf()">Export as PDF</button>
 
     <div id="main"></div>
 
@@ -4469,9 +4470,43 @@
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+js
+Kodu kopyala
 
 <script>
 
+  async function exportCalendarPdf() {
+    const calendarEl = document.getElementById('main');
+
+    const canvas = await html2canvas(calendarEl, {
+      scale: 2,
+      useCORS: true
+    });
+
+    const base64 = canvas.toDataURL('image/png');
+
+    const formData = new FormData();
+    formData.append('img', base64);
+
+    const response = await fetch('/export-program-pdf', {
+      method: 'POST',
+      body: formData
+    });
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "program.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
 
  document.addEventListener('DOMContentLoaded', function () {
 
