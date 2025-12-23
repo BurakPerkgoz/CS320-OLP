@@ -3924,6 +3924,7 @@
 
     <!-- **Main** -->
     <button onclick="exportCalendarPdf()">Export as PDF</button>
+    <button onclick="clearProgram()">Clear Program</button>
 
     <div id="main"></div>
 
@@ -4506,6 +4507,22 @@ Kodu kopyala
 
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+  }
+
+  function clearProgram() {
+    fetch('/clear-program')
+     .then(response => {
+       if (!response.ok) {
+         throw new Error('Network response was not ok');
+       }
+       return response.text();
+     })
+     .then(data => {
+      window.location.reload();
+     })
+     .catch(error => {
+       console.error('Error fetching student:', error);
+     });
   }
 
  document.addEventListener('DOMContentLoaded', function () {

@@ -162,12 +162,12 @@ public class CourseModel {
                 <div class="dtlms-courselist-details-inner">
                     <div class="dtlms-courselist-metadata-holder">
                         <h5>
-                            <a href="/courses/%s">%s (%s-%s)</a>
+                            <a href="#">%s (%s-%s)</a>
                         </h5>
                         <div class="dtlms-courselist-metadata">
                             <p class="dtlms-courselist-tags">
                                 <i class="fas fa-tag"></i>
-                                <a href="#">%s</a>
+                                <a>%s</a>
                             </p>
                             <p class="dtlms-courselist-faculty">
                                 <i class="fas fa-university"></i>
@@ -179,7 +179,7 @@ public class CourseModel {
                             </p>
                             <p class="dtlms-courselist-curriculum">
                                 <i class="fas fa-book"></i>
-                                5 Curriculum
+                                %s
                             </p>
                         </div>
                     </div>
@@ -208,7 +208,6 @@ public class CourseModel {
         </div>
         """.formatted(
                 c.getId(),
-                slug(c.getTitle()),
                 c.getTitle(),
                 c.getCourseNo(),
                 c.getSectionNo(),
@@ -216,6 +215,7 @@ public class CourseModel {
                 c.getFaculty(),
                 c.getPartOfTerm(),
                 c.getInstructorFullName(),
+                c.getPrerequisite(),
                 description,
                 priceHtml(c.getCredits()),
                 cartHtml(c.getCredits(), c.getId()),

@@ -66,8 +66,8 @@ public class Connection {
     }
 
     public static void insertStudent(String studentId, String major, int creditLimit, String takenCourses,
-                                     String semester, String nameSurname, String currentCourses) {
-        String query = "INSERT INTO students (student_id, major, credit_limit, tooken_courses, semester, name_surname, current_courses) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                                     String semester, String nameSurname, String currentCourses, int totalCredits) {
+        String query = "INSERT INTO students (student_id, major, credit_limit, tooken_courses, semester, name_surname, current_courses, total_credits) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -78,6 +78,7 @@ public class Connection {
             statement.setString(5, semester);
             statement.setString(6, nameSurname);
             statement.setString(7, currentCourses);
+            statement.setInt(8, totalCredits);
 
             int rowsAffected = statement.executeUpdate();
             System.out.println(rowsAffected + " row(s) inserted.");
@@ -126,6 +127,18 @@ public class Connection {
         return null;
     }
 
+    public static void deleteTakenCourses(String studentId) {
+        String query = "UPDATE students SET tooken_courses = '' WHERE student_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, studentId);
+
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static String getCurrentCourses(String studentId) {
         String query = "SELECT current_courses FROM students WHERE student_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -140,6 +153,19 @@ public class Connection {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void deleteCurrentCourses(String studentId) {
+        String query = "UPDATE students SET current_courses = '' WHERE student_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, studentId);
+
+            statement.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addTakenCourse(String studentId, String newCourseId) {

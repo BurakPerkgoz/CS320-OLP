@@ -92,6 +92,19 @@ public class Controller {
         return ResponseEntity.ok(session.getAttribute("name_surname").toString());
     }
 
+    @GetMapping("/clear-program")
+    public ResponseEntity<String> clearProgram(HttpSession session) throws SQLException {
+
+        if (session.getAttribute("student_id") == null) {
+            return ResponseEntity.ok("user not logged in.");
+        }
+
+        Connection.deleteTakenCourses((String) session.getAttribute("student_id"));
+        Connection.deleteCurrentCourses((String) session.getAttribute("student_id"));
+
+        return ResponseEntity.ok("program is cleared");
+    }
+
     @GetMapping("/get-program")
     public ResponseEntity<String> getProgram(HttpSession session) throws SQLException {
 
@@ -99,12 +112,22 @@ public class Controller {
             return ResponseEntity.ok("user not logged in.");
         }
 
-        List<Course> courses = Connection.getCoursesOfMajor((String) session.getAttribute("major"), (String) session.getAttribute("semester"));
+        List<Course> courses = List.of();
 
         String extra_taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
 
-        for (String extra_course_id : extra_taken_courses.split(",")) {
-            courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+        if (extra_taken_courses != null && !extra_taken_courses.isEmpty()) {
+            for (String extra_course_id : extra_taken_courses.split(",")) {
+                courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+            }
+        }
+
+        String extra_current_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
+
+        if (extra_current_courses != null && !extra_current_courses.isEmpty()) {
+            for (String extra_course_id : extra_current_courses.split(",")) {
+                courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+            }
         }
 
         JsonArray jsonArray = new JsonArray();
@@ -337,7 +360,7 @@ public class Controller {
 
             currentCourses.deleteCharAt(currentCourses.length() - 1);
 
-            Connection.insertStudent(studentId, major, credit, "", semester, nameSurname, currentCourses.toString());
+            Connection.insertStudent(studentId, major, credit, "", semester, nameSurname, currentCourses.toString(), total_credits);
         }
 
         System.out.println("Student ID: " + studentId);
