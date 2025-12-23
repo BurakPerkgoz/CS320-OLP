@@ -2,6 +2,7 @@ package olp.model;
 
 import olp.controller.Course;
 import olp.database.Connection;
+import olp.utils.MajorMapper;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -29,7 +30,12 @@ public class GraduationTableModel {
             List<Course> courses = Connection.getCoursesOfMajor(major, String.valueOf(i));
 
             for (Course course : courses) {
-                boolean isTook = Connection.getTakenCourses(student_id).contains(String.valueOf(course.getId()));  // Assuming you have a method that tells if the course has been "took"
+
+                boolean isTook = Connection.getTakenCourses(student_id).contains(String.valueOf(course.getId()));
+
+                if (course.getId() == 0) {
+                    isTook = false;
+                }
 
                 String checkboxFill = isTook ? "currentColor" : "none";
                 String checkboxStroke = isTook ? "none" : "currentColor";
@@ -72,7 +78,7 @@ public class GraduationTableModel {
                             </div>
                         </div>""");
 
-            result.append(html.toString().formatted("Bilgisayar Mühendisliği", mapQuarterToSemester(i)));
+            result.append(html.toString().formatted(MajorMapper.toDisplayName(major), mapQuarterToSemester(i)));
         }
 
         return result.toString();
@@ -91,4 +97,3 @@ public class GraduationTableModel {
         return mapping.get("Q"+quarter);
     }
 }
-

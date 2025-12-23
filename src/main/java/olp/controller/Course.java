@@ -73,4 +73,24 @@ public class Course {
 
     public String getFaculty() { return faculty; }
     public void setFaculty(String faculty) { this.faculty = faculty; }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", subject='" + subject + '\'' +
+                ", credits=" + credits +
+                ", courseNo='" + courseNo + '\'' +
+                ", sectionNo='" + sectionNo + '\'' +
+                ", instructorFullName='" + instructorFullName + '\'' +
+                ", partOfTerm='" + partOfTerm + '\'' +
+                ", corequisite='" + corequisite + '\'' +
+                ", prerequisite='" + prerequisite + '\'' +
+                ", scheduleForPrint='" + scheduleForPrint + '\'' +
+                ", faculty='" + faculty + '\'' +
+                '}';
+    }
+
 }

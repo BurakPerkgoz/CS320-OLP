@@ -2,21 +2,26 @@ package olp.controller;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import olp.database.Connection;
 import olp.model.CourseDetailsModel;
 import olp.model.CourseModel;
 import olp.database.FacultyType;
 import olp.model.GraduationTableModel;
+import olp.utils.AI;
+import olp.utils.PdfGenerator;
+import olp.utils.PrerequisiteParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @org.springframework.stereotype.Controller
 public class Controller {
@@ -71,7 +76,11 @@ public class Controller {
         return "forward:/program.html";
     }
 
+    @GetMapping("/get-student")
+    public ResponseEntity<String> getStudent(HttpSession session) throws SQLException {
 
+        return ResponseEntity.ok(session.getAttribute("name_surname").toString());
+    }
 
     @GetMapping("/get-program")
     public ResponseEntity<String> getProgram(HttpSession session) throws SQLException {
@@ -143,6 +152,42 @@ public class Controller {
         return ResponseEntity.ok(GraduationTableModel.buildHtml((String) session.getAttribute("student_id"),(String) session.getAttribute("major")));
     }
 
+    @GetMapping("/export-pdf")
+    public void exportPDF(
+            HttpSession session,
+            HttpServletResponse response
+    ) {
+        try {
+            response.setContentType("application/pdf");
+            response.setHeader(
+                    "Content-Disposition",
+                    "attachment; filename=courses.pdf"
+            );
+
+            PdfGenerator.generateCurriculumPdf(
+                    session.getAttribute("major").toString(),
+                    session.getAttribute("student_id").toString(),
+                    response.getOutputStream()
+            );
+
+            response.flushBuffer();
+
+        } catch (Exception e) {
+            throw new RuntimeException("PDF generation failed", e);
+        }
+    }
+
+    @PostMapping(value = "/ask-ai",
+            consumes=MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces=MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> askAI(HttpSession session,
+                                                  @RequestParam("text") String text
+    ) throws SQLException, IOException, InterruptedException {
+
+        return ResponseEntity.ok(AI.askAI((String) session.getAttribute("major"), String.valueOf(session.getAttribute("credit")), (String) session.getAttribute("semester"), text));
+
+    }
+
     @PostMapping(value = "/took-course",
             consumes=MediaType.MULTIPART_FORM_DATA_VALUE,
             produces=MediaType.TEXT_HTML_VALUE)
@@ -152,6 +197,45 @@ public class Controller {
 
         if (session.getAttribute("student_id") == null) {
             return ResponseEntity.ok("user not logged in.");
+        }
+
+        String prerequirements = Connection.getCourseByID(id).getPrerequisite();
+
+        if (prerequirements != "") {
+
+            String[] prerequirement_array = prerequirements.split(" ");
+
+            String needed_credits = "";
+
+            for (int i = 0; i < prerequirement_array.length; ++i) {
+                if (prerequirement_array[i].contains("AKTS") || prerequirement_array[i].contains("ECTS")) {
+                    needed_credits = prerequirement_array[i - 1];
+                    break;
+                }
+            }
+
+            if (Integer.valueOf((String) session.getAttribute("total_credit")) <  Integer.valueOf(needed_credits)) {
+                return ResponseEntity.ok("Credit requirement not matched for this course, your credits : " + session.getAttribute("total_credit") + ", required credits : " + needed_credits);
+            }
+
+
+
+            PrerequisiteParser.Expr expr = PrerequisiteParser.parsePrerequisite(prerequirements);
+
+            Set<String> student_taken_courses = Set.of();
+
+            String taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
+
+            String[] token_course_list =  taken_courses.split(",");
+
+            for (String taken_course_id : token_course_list) {
+                Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
+                student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
+            }
+
+            if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
+                return ResponseEntity.ok("Prerequirements are not met.");
+            }
         }
 
         Connection.addTakenCourse((String) session.getAttribute("student_id"), String.valueOf(id));
@@ -173,6 +257,7 @@ public class Controller {
             @RequestParam("student_id") String studentId,
             @RequestParam("name_surname") String nameSurname,
             @RequestParam("credit") int credit,
+            @RequestParam("total_credits") int total_credits,
             @RequestParam("major") String major,
             @RequestParam("semester") String semester,
             @RequestParam("action") String action,
@@ -181,6 +266,7 @@ public class Controller {
         session.setAttribute("student_id", studentId);
         session.setAttribute("name_surname", nameSurname);
         session.setAttribute("credit", credit);
+        session.setAttribute("total_credits", total_credits);
         session.setAttribute("major", major);
         session.setAttribute("semester", semester);
 
@@ -201,10 +287,9 @@ public class Controller {
         System.out.println("Student ID: " + studentId);
         System.out.println("Name: " + nameSurname);
         System.out.println("Credit: " + credit);
+        System.out.println("Total Credit: " + total_credits);
         System.out.println("Major: " + major);
         System.out.println("Semester: " + semester);
-
-        // Process data (e.g., save to database or other business logic)
 
         return "Post login success";
     }
@@ -215,7 +300,7 @@ public class Controller {
             produces=MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> handleCourses(
             @RequestParam Map<String, String> params,
-            @RequestParam(name="coursefilter-category", required=false) List<Integer> facultyIds,
+            @RequestParam(name="category[]", required=false) List<Integer> facultyIds,
             HttpSession session
     ) {
 
@@ -247,5 +332,15 @@ public class Controller {
         }
     }
 
+    public static Set<String> extractCourses(String text) {
+        Set<String> courses = new LinkedHashSet<>();
 
+        Pattern p = Pattern.compile("\\b[A-Z]{2,5}\\s?\\d{3}\\b");
+        Matcher m = p.matcher(text.toUpperCase());
+
+        while (m.find()) {
+            courses.add(m.group().replaceAll("\\s+", " "));
+        }
+        return courses;
+    }
 }

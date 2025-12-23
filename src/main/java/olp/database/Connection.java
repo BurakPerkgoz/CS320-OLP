@@ -47,7 +47,6 @@ public class Connection {
             }
         }
 
-        System.out.println(subject + " - " + code);
         return null;
     }
 
@@ -283,6 +282,8 @@ public class Connection {
 
                         secCourse.setTitle(title);
                         secCourse.setCredits(credits);
+                        secCourse.setSubject(subject);
+                        secCourse.setCourseNo(code);
 
                         courses.add(secCourse);
                     }
@@ -350,6 +351,8 @@ public class Connection {
 
         sql.append(" ORDER BY ").append(resolveOrderBy(orderBy, orderDir));
         sql.append(" LIMIT ? OFFSET ?");
+
+        System.out.println(sql);
 
         List<Course> courses = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {

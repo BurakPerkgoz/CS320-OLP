@@ -12,7 +12,7 @@
     <script>
         document.documentElement.className = document.documentElement.className + ' yes-js js_active js'
     </script>
-    <title>Courses-Template &#8211; LMS Elementor Site</title>
+    <title>Courses &#8211; LMS Elementor Site</title>
     <meta name='robots' content='noindex, nofollow' />
     <style>
         img:is([sizes="auto" i], [sizes^="auto," i]) {
@@ -3856,19 +3856,40 @@
                                                         </div>
                                                         <div class="elementor-column elementor-col-50 elementor-inner-column elementor-element elementor-element-12e1524" data-id="12e1524" data-element_type="column">
                                                             <div class="elementor-widget-wrap elementor-element-populated">
-                                                                <div class="elementor-element elementor-element-75171d5 elementor-widget__width-auto elementor-widget elementor-widget-dtlms-widget-default-login-logout-links" data-id="75171d5" data-element_type="widget" data-settings="{&quot;wdt_animation_effect&quot;:&quot;none&quot;}" data-widget_type="dtlms-widget-default-login-logout-links.default">
+                                                                <div class="elementor-element elementor-element-179b237 elementor-widget__width-auto elementor-widget elementor-widget-wdt-header-menu" data-id="179b237" data-element_type="widget" data-settings="{&quot;wdt_animation_effect&quot;:&quot;none&quot;}" data-widget_type="wdt-header-menu.default">
                                                                     <div class="elementor-widget-container">
+                                                                        <div class="wdt-header-menu" data-menu="16">
+                                                                            <div class="menu-container">
+                                                                                <ul id="menu-menu-2" class="wdt-primary-nav " data-menu="16">
+                                                                                    <li class="close-nav"><a href="javascript:void(0);"></a></li>
+                                                                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-has-children menu-item-19592 menu-item-depth-0"><a href="/"><span data-text="%1$s">Courses</span></a>
 
-                                                                        <ul class="dtlms-custom-login ">
-                                                                            <li>
-                                                                                <a href="#" title="Login">
-                                                                                    <i class="fa fa-user"></i>
-                                                                                    <span th:text="${student_id}"></span>
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
+                                                                                    </li>
+                                                                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-19913 menu-item-depth-0"><a href="/program"><span data-text="%1$s">Program</span></a>
+
+                                                                                    </li>
+                                                                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-19913 menu-item-depth-0"><a href="/graduation"><span data-text="%1$s">Graduation Plan</span></a>
+
+                                                                                    </li>
+                                                                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children has-mega-menu menu-item-36 menu-item-depth-0"><a href="/login"><span data-text="%1$s">Back to Login</span></a>
+
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="sub-menu-overlay"></div>
+                                                                            </div>
+                                                                            <div class="mobile-nav-container mobile-nav-offcanvas-right" data-menu="16"><a href="#" class="menu-trigger menu-trigger-icon" data-menu="16"><i></i><span>Menu</span></a>
+                                                                                <div class="mobile-menu" data-menu="16"></div>
+                                                                                <div class="overlay"></div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="elementor-element elementor-element-75171d5 elementor-widget__width-auto elementor-widget elementor-widget-dtlms-widget-default-login-logout-links" data-id="75171d5" data-element_type="widget" data-settings="{&quot;wdt_animation_effect&quot;:&quot;none&quot;}" data-widget_type="dtlms-widget-default-login-logout-links.default">
+                                                                    <div class="elementor-widget-container">
+                                                                        <ul class="dtlms-custom-login "><li><a href="#" title="Login" class="dtlms-login-link" onclick="return false"><i class="fa fa-user"></i></a></li><span> </span><li><a href="#" title="Register"><i class="fas fa-key"></i></a></li></ul>
+                                                                    </div>
+                                                                </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3891,9 +3912,9 @@
                     <div class="main-title-section-container">
                         <div class="container">
                             <div class="main-title-section">
-                                <h1>Courses-Template</h1>
+                                <h1>Courses</h1>
                             </div>
-                            <div class="breadcrumb"><a href="/">Home</a><span class="breadcrumb-default-delimiter"></span><span class="current">Courses-Template</span></div>
+                            <div class="breadcrumb"><a href="/">Home</a><span class="breadcrumb-default-delimiter"></span><span class="current">Courses</span></div>
                         </div>
                     </div>
                     <div class="main-title-section-bg"></div>
@@ -4599,6 +4620,33 @@
         <span id="back-to-top-hover"></span>
         <span class="back-to-top-icon"><i class="wdticon-angle-up"></i></span>
     </a>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+           fetch('/get-student')
+             .then(response => {
+               if (!response.ok) {
+                 throw new Error('Network response was not ok');
+               }
+               return response.text();
+             })
+             .then(student => {
+               const el = document.querySelector('[title="Register"]');
+               if (el && student) {
+                 el.textContent = student;
+               }
+             })
+             .catch(error => {
+               console.error('Error fetching student:', error);
+             });
+
+
+       });
+
+    </script>
+
 </body>
 
 </html>
