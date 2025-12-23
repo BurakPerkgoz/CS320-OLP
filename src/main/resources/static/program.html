@@ -4472,8 +4472,9 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-js
-Kodu kopyala
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 
 <script>
 
@@ -4512,9 +4513,16 @@ Kodu kopyala
   function clearProgram() {
     fetch('/clear-program')
      .then(response => {
-       if (!response.ok) {
-         throw new Error('Network response was not ok');
-       }
+        if (!response.ok) {
+          return response.text().then(text => {
+            Swal.fire({
+              icon: 'error',
+              title: `Error ${response.status}`,
+              text: text || 'Something went wrong'
+            });
+            throw new Error(text);
+          });
+        }
        return response.text();
      })
      .then(data => {
@@ -4530,8 +4538,15 @@ Kodu kopyala
     fetch('/get-student')
      .then(response => {
        if (!response.ok) {
-         throw new Error('Network response was not ok');
-       }
+          return response.text().then(text => {
+            Swal.fire({
+              icon: 'error',
+              title: `Error ${response.status}`,
+              text: text || 'Something went wrong'
+            });
+            throw new Error(text);
+          });
+        }
        return response.text();
      })
      .then(student => {

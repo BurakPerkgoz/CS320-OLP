@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ConcurrentModel;
@@ -29,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,21 +114,27 @@ public class Controller {
             return ResponseEntity.ok("user not logged in.");
         }
 
-        List<Course> courses = List.of();
+        List<Course> courses = new ArrayList<>();
 
         String extra_taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
 
         if (extra_taken_courses != null && !extra_taken_courses.isEmpty()) {
-            for (String extra_course_id : extra_taken_courses.split(",")) {
-                courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+            if (extra_taken_courses.contains(",")) {
+                for (String extra_course_id : extra_taken_courses.split(",")) {
+                    Course extra_course = Connection.getCourseByID(Integer.parseInt(extra_course_id));
+                    courses.add(extra_course);
+                }
             }
         }
 
         String extra_current_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
 
         if (extra_current_courses != null && !extra_current_courses.isEmpty()) {
-            for (String extra_course_id : extra_current_courses.split(",")) {
-                courses.add(Connection.getCourseByID(Integer.valueOf(extra_course_id)));
+            if (extra_current_courses.contains(",")) {
+                for (String extra_course_id : extra_current_courses.split(",")) {
+                    Course extra_course = Connection.getCourseByID(Integer.parseInt(extra_course_id));
+                    courses.add(extra_course);
+                }
             }
         }
 
@@ -256,7 +264,49 @@ public class Controller {
             return ResponseEntity.ok("user not logged in.");
         }
 
-        String prerequirements = Connection.getCourseByID(id).getPrerequisite();
+        Course target_course = Connection.getCourseByID(id);
+
+        if (target_course == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("course not found.");
+        }
+
+        int credits = 0;
+
+        String extra_taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
+
+        if (extra_taken_courses != null && !extra_taken_courses.isEmpty()) {
+            if (extra_taken_courses.contains(",")) {
+                for (String extra_course_id : extra_taken_courses.split(",")) {
+                    Course extra_course = Connection.getCourseByID(Integer.parseInt(extra_course_id));
+                    if (extra_course != null) {
+                        credits += extra_course.getCredits();
+                    }
+                }
+            }
+        }
+
+        String extra_current_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
+
+        if (extra_current_courses != null && !extra_current_courses.isEmpty()) {
+            if (extra_current_courses.contains(",")) {
+                for (String extra_course_id : extra_current_courses.split(",")) {
+                    Course extra_course = Connection.getCourseByID(Integer.parseInt(extra_course_id));
+                    if (extra_course != null) {
+                        credits += extra_course.getCredits();
+                    }
+                }
+            }
+        }
+
+        if ((credits + target_course.getCredits()) > (Integer)(session.getAttribute("credit"))) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Credit limit is exceeded");
+        }
+
+        String prerequirements = target_course.getPrerequisite();
 
         if (prerequirements != null && !prerequirements.isEmpty()) {
 
@@ -271,9 +321,12 @@ public class Controller {
                 }
             }
 
-            if (!needed_credits.isEmpty()) {
-                if (Integer.valueOf((String) session.getAttribute("total_credit")) <  Integer.valueOf(needed_credits)) {
-                    return ResponseEntity.ok("Credit requirement not matched for this course, your credits : " + session.getAttribute("total_credit") + ", required credits : " + needed_credits);
+            if (needed_credits != null && !needed_credits.isEmpty()) {
+                if (Integer.parseInt((String) session.getAttribute("total_credit")) <  Integer.parseInt(needed_credits)) {
+
+                    return ResponseEntity
+                            .status(HttpStatus.BAD_REQUEST)
+                            .body("Credit requirement not matched for this course, your credits : " + session.getAttribute("total_credit") + ", required credits : " + needed_credits);
                 }
             }
 
@@ -281,32 +334,41 @@ public class Controller {
             if (!prerequirements.contains("Dil sınavından başarılı sonucuna sahip olmak")) {
                 PrerequisiteParser.Expr expr = PrerequisiteParser.parsePrerequisite(prerequirements);
 
-                Set<String> student_taken_courses = Set.of();
+                Set<String> student_taken_courses = new HashSet<>();
 
                 String taken_courses = Connection.getTakenCourses((String) session.getAttribute("student_id"));
 
-                String[] token_course_list =  taken_courses.split(",");
+                if (taken_courses != null && taken_courses.contains(",")) {
+                    String[] token_course_list =  taken_courses.split(",");
 
-                for (String taken_course_id : token_course_list) {
-                    Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
-                    student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
+                    for (String taken_course_id : token_course_list) {
+                        Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
+                        student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
+                    }
+
+                    if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
+                        return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body("Prerequirements are not met.");
+
+                    }
                 }
 
-                if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
-                    return ResponseEntity.ok("Prerequirements are not met.");
-                }
+                String current_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
 
-                taken_courses = Connection.getCurrentCourses((String) session.getAttribute("student_id"));
+                if (current_courses != null && current_courses.contains(",")) {
+                    String[] current_course_list =  current_courses.split(",");
 
-                token_course_list =  taken_courses.split(",");
+                    for (String current_course_id : current_course_list) {
+                        Course current_course =  Connection.getCourseByID(Long.parseLong(current_course_id));
+                        student_taken_courses.add(current_course.getSubject() + " " + current_course.getCourseNo());
+                    }
 
-                for (String taken_course_id : token_course_list) {
-                    Course taken_course =  Connection.getCourseByID(Long.parseLong(taken_course_id));
-                    student_taken_courses.add(taken_course.getSubject() + " " + taken_course.getCourseNo());
-                }
-
-                if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
-                    return ResponseEntity.ok("Prerequirements are not met.");
+                    if (!PrerequisiteParser.satisfies(expr, student_taken_courses)) {
+                        return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body("Prerequirements are not met.");
+                    }
                 }
             }
         }
