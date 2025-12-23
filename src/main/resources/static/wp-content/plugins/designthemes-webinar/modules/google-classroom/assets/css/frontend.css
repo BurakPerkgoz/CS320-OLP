@@ -1,0 +1,151 @@
+/* ClassRoom */
+
+.dtwb-classroom-container .dtwb-classroom-item {margin-bottom: 30px;background-color: #00C864;border-radius: 5px;box-shadow: 0 5px 10px 0 rgba(0,0,0,.18);background-image: url(../../../../assets/images/shape.png); background-repeat: no-repeat;background-position: right top;  transition: all 300ms linear; }
+
+.dtwb-classroom-container .dtwb-classroom-item div {
+    padding: 0px 30px;
+    margin: 15px 0;
+	position: relative;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-section {
+    font-size: 16px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-section span:after {content: "\f02d";font-family: Fontawesome;color: #fff;position: relative;top: 1px;margin-right: 10px;font-size: 16px;}
+
+.dtwb-classroom-container .dtwb-classroom-item-title {
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-description {
+    line-height: 24px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-access-code span {
+    position: relative;
+    align-items: center;
+    padding: 8px 8px 8px 10px;
+    border: 1px dashed #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    color: #000;
+    background-color: #fff;
+    font-size: 22px;
+    text-align: center;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-access-code span:after {
+    position: absolute;
+    content: "Get My Code";
+    padding: 0px 10px;
+    color: #fff;
+    font-size: 12px;
+    right: 1px;
+    left: 1px;
+    top: 1px;
+    bottom: 1px;
+    line-height: 38px;
+    font-size: 18px;
+    text-align: center;
+	transition: all 300ms linear;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item-link a {
+    font-size: 14px;
+    line-height: normal;
+    display: inline-block;
+    margin: 0px 0px 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 3px;
+    color: #fff;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item div:first-child {
+    margin-top: 25px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item div:last-child {
+    margin-bottom: 20px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item div {color: #fff;}
+
+.dtwb-classroom-container .dtwb-classroom-item-link a:after {
+    position: absolute;
+    content: "";
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    height: 2px;
+    background: #fff;
+    transition: all 300ms linear;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item:hover a:after {
+    width: 50px;
+}
+
+.dtwb-classroom-container .dtwb-classroom-item, .dtwb-classroom-container .dtwb-classroom-item .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(3), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(3) .dtwb-classroom-item-access-code span:after { background-color: #00C864; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(2), .dtwb-classroom-container .dtwb-classroom-item:nth-child(2) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(4), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(4) .dtwb-classroom-item-access-code span:after { background-color: #FF8800; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(3), .dtwb-classroom-container .dtwb-classroom-item:nth-child(3) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover, .dtwb-classroom-container .dtwb-classroom-item:hover .dtwb-classroom-item-access-code span:after { background-color: #F20F10 ; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(4), .dtwb-classroom-container .dtwb-classroom-item:nth-child(4) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(2), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(2) .dtwb-classroom-item-access-code span:after { background-color: #004FE1; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(5), .dtwb-classroom-container .dtwb-classroom-item:nth-child(5) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(7), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(7) .dtwb-classroom-item-access-code span:after { background-color: #fd6ca3; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(6), .dtwb-classroom-container .dtwb-classroom-item:nth-child(6) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(8), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(8) .dtwb-classroom-item-access-code span:after { background-color: #9b59b6; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(7), .dtwb-classroom-container .dtwb-classroom-item:nth-child(7) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(5), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(5) .dtwb-classroom-item-access-code span:after { background-color: #32ccbd ; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(8), .dtwb-classroom-container .dtwb-classroom-item:nth-child(8) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(6), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(6) .dtwb-classroom-item-access-code span:after { background-color: #009688; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(9), .dtwb-classroom-container .dtwb-classroom-item:nth-child(9) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(11), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(11) .dtwb-classroom-item-access-code span:after { background-color: #9c27b0; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(10), .dtwb-classroom-container .dtwb-classroom-item:nth-child(10) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(12), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(12) .dtwb-classroom-item-access-code span:after { background-color: #cb506d; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(11), .dtwb-classroom-container .dtwb-classroom-item:nth-child(11) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(9), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(9) .dtwb-classroom-item-access-code span:after { background-color: #cddc39; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(12), .dtwb-classroom-container .dtwb-classroom-item:nth-child(12) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(10), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(10) .dtwb-classroom-item-access-code span:after { background-color: #60ae0d; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(13), .dtwb-classroom-container .dtwb-classroom-item:nth-child(13) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(15), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(15) .dtwb-classroom-item-access-code span:after { background-color: #ec1a6a; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(14), .dtwb-classroom-container .dtwb-classroom-item:nth-child(14) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(16), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(16) .dtwb-classroom-item-access-code span:after { background-color: #b48b3c; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(15), .dtwb-classroom-container .dtwb-classroom-item:nth-child(15) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(13), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(13) .dtwb-classroom-item-access-code span:after { background-color: #00bcd4 ; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(16), .dtwb-classroom-container .dtwb-classroom-item:nth-child(16) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(14), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(14) .dtwb-classroom-item-access-code span:after { background-color: #c10841; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(17), .dtwb-classroom-container .dtwb-classroom-item:nth-child(17) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(19), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(19) .dtwb-classroom-item-access-code span:after { background-color: #3c939d; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(18), .dtwb-classroom-container .dtwb-classroom-item:nth-child(18) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(20), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(20) .dtwb-classroom-item-access-code span:after { background-color: #795548; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(19), .dtwb-classroom-container .dtwb-classroom-item:nth-child(19) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(17), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(17) .dtwb-classroom-item-access-code span:after { background-color: bfb110; }
+
+.dtwb-classroom-container .dtwb-classroom-item:nth-child(20), .dtwb-classroom-container .dtwb-classroom-item:nth-child(20) .dtwb-classroom-item-access-code span:after, .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(18), .dtwb-classroom-container .dtwb-classroom-item:hover:nth-child(18) .dtwb-classroom-item-access-code span:after { background-color: 09da30; }
+
+span.dtwb-classroom-item-access-code-copied {
+    position: absolute !important;
+    top: 0;
+    left: 30px;
+    right: 30px;
+    font-size: 14px !important;
+    text-align: center !important;
+}
+
+span.dtwb-classroom-item-access-code-copied:after { display: none; }
+
+.dtwb-classroom-container .dtwb-classroom-item-access-code span:hover:after {
+    opacity: 0;
+}
+
