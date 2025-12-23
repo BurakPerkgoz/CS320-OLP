@@ -1,0 +1,22 @@
+.tribe-events th{
+    background-color: transparent;
+}
+.tribe-events .tribe-events-c-top-bar__datepicker-button {
+    background-color: transparent; 
+    margin-top: 0;
+}
+.tribe-events .tribe-events-c-top-bar__datepicker-button:hover {
+    background-color: transparent;
+    color: inherit;
+    opacity: 1;
+}
+
+.tribe-common .tribe-common-c-loader__dot circle {
+    opacity: 1;
+}
+.single-tribe_events .tribe-events-single .tribe-events-event-meta {
+    width: 50%;
+}
+.tribe-events-single .tribe-events-sub-nav {
+    padding: 0;
+}
