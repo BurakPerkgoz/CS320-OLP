@@ -449,7 +449,7 @@ public class Connection {
             WHERE 1=1
         """);
 
-        if (hasSearch) sql.append(" AND (CourseNo LIKE ? OR Subject LIKE ?)");
+        if (hasSearch) sql.append(" AND (CourseNo LIKE ? OR Subject LIKE ? or Title LIKE ?)");
         if (hasFaculty) {
             sql.append(" AND Faculty IN (");
             sql.append("?,".repeat(faculties.size()));
@@ -461,6 +461,7 @@ public class Connection {
             int idx = 1;
             if (hasSearch) {
                 String like = "%" + searchText + "%";
+                stmt.setString(idx++, like);
                 stmt.setString(idx++, like);
                 stmt.setString(idx++, like);
             }
