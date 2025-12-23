@@ -1,4 +1,4 @@
-package olp.models;
+package olp.model;
 
 import olp.controller.Course;
 
