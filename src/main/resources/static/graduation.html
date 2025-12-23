@@ -4717,12 +4717,7 @@
                                 <div class="dtlms-course-dynamic-section-holder"></div>
                                 <div class="dtlms-courses-detail-holder">
                                     <div class="dtlms-title">Course Info</div>
-                                    <ul class="dtlms-course-detail-info">
-                                        <li><span class="info-lessons"></span><label>Lessons : </label>5</li>
-                                        <li><span class="info-quizzes"></span><label>Quizzes : </label>2</li>
-                                        <li><span class="info-duration"></span><label>Duration : </label>1 days 1 hours 50 minutes </li>
-                                        <li><span class="info-capacity"></span><label>Capacity </label>: 50</li>
-                                    </ul>
+
                                 </div>
                             </div>
                         </article>
@@ -6029,6 +6024,36 @@
     </a>
 
     <script>
+
+        function toggleCourse(id, element) {
+
+            var svgRect = element.querySelector('svg rect');
+            if (svgRect) {
+                if (svgRect.getAttribute('fill') === 'currentColor') {
+                    svgRect.setAttribute('fill', 'none');
+                    svgRect.setAttribute('stroke', 'currentColor');
+                } else {
+                    svgRect.setAttribute('fill', 'currentColor');
+                    svgRect.setAttribute('stroke', 'none');
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('id', id);
+
+            fetch('/took-course', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error fetching course details:', error);
+            });
+        }
+
         let lastCourse = '';
         function getCourseDetails(id) {
             const courseDetailsElement = document.getElementById('coursedetails');
@@ -6036,27 +6061,30 @@
             if (lastCourse == id) {
                 if (courseDetailsElement.style.display === "none" || courseDetailsElement.style.display === "") {
                     courseDetailsElement.style.display = "block";
+                    return;
                 }
                 else {
                     courseDetailsElement.style.display = "none";
+                    return;
                 }
             }
             else {
                 courseDetailsElement.style.display = "block";
             }
 
+            const formData = new FormData();
+            formData.append('id', id);
 
             fetch('/get-course-details', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: id })
+                body: formData
             })
             .then(response => response.text())
             .then(data => {
-                courseDetailsElement.innerHTML = response;
                 lastCourse = id;
+                document.querySelectorAll(".dtlms-course-detail-info").forEach(el => el.remove());
+                const target = document.querySelector(".dtlms-courses-detail-holder");
+                target.insertAdjacentHTML("afterend", data);
             })
             .catch(error => {
                 console.error('Error fetching course details:', error);
